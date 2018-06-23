@@ -15,7 +15,6 @@ const User = mongoose.model('User', {
     trim: true,
     minlength: 1,
   },
-
 });
 
 const user = new User({
