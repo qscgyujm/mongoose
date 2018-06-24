@@ -52,17 +52,25 @@ app.get('/todos/:id', (req, res) => {
     res.send({ todo });
   }).catch(e => {
     res.status(400).send();
-  })
+  });
+});
 
-  // valid id user isvalid
-  // 404
-  // findById
-  // success
-  // if todo
-  // if no todo
-  // error
-  // 400
-})
+
+app.delete('/todos/:id', (req, res) => {
+  // get the ID
+  const id = req.params.id;
+
+  // validate the ID -> not valid return 404
+  if (!ObjectID.isValid(id)) return res.status(404).send();
+
+  // remove by ID
+  Todo.findByIdAndRemove(id).then(todo => {
+    if (!todo) return res.status(404).send();
+    res.send(todo);
+  }).catch(err => {
+    res.status(400).send();
+  });
+});
 
 app.listen(3000, () => {
 
