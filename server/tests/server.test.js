@@ -98,11 +98,55 @@ describe('GET /todos', () => {
       .end(done);
   });
 
-  it('should return 404 for non-object IDs', done=>{
+  it('should return 404 for non-object IDs', done => {
     // /todos/123
 
     request(app)
       .get('/todos/abc123')
+      .expect(404)
+      .end(done);
+  });
+});
+
+// Delete Tesing
+describe('Delete /todos/:id', () => {
+  it('should remove a todo', done => {
+    const hexID = todos[1]._id.toHexString();
+
+    request(app)
+      .delete(`/todos/${hexID}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo._id).toBe(hexID);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err)
+        }
+
+        // queries database using findById toNotExist
+        Todo.findById(hexID).then(todo => {
+          expect(todo).toBeFalsy();
+          // .toBeFalsy() 
+          // https://facebook.github.io/jest/docs/en/expect.html#tobefalsy
+          done();
+        }).catch(err => done(err));
+      });
+  });
+
+  it('should return 404 if todo not found', done => {
+    const hexID = new ObjectID().toHexString();
+
+    request(app)
+      .delete(`/todos/${hexID}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if object id is in valid', done => {
+    
+    request(app)
+      .delete('/todos/abc123')
       .expect(404)
       .end(done);
   });
