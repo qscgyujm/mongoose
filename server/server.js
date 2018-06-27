@@ -10,6 +10,7 @@ const { User } = require('./models/user');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false}));
 
 // 新增 到 mongo DB
 app.post('/todos', (req, res) => {
@@ -102,6 +103,12 @@ app.patch('/todos/:id', (req, res) => {
     });
 
 });
+
+
+// app.post('/test', (req, res) => {
+//   console.log(req.body);
+//   res.send(req.body);
+// })
 
 
 app.listen(3000, () => {
