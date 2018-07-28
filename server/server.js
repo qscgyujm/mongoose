@@ -8,6 +8,9 @@ const { mongoose } = require('./db/mongoose');
 const { Todo } = require('./models/todo');
 const { User } = require('./models/user');
 const Book = require('./models/Book');
+const { authenticate } = require('./middleware/authenticate');
+
+const { hihi, api, all } = require('./next/next');
 
 // 建立express
 const app = express();
@@ -182,6 +185,66 @@ app.delete('/book/:id', (req, res) => {
     });
 
 })
+
+
+// test next
+// app.get('/next/api/hihi', (req, res) => {
+//   hihi(req, res)
+// });
+// app.get('/next/api', (req, res, next) => {
+//   api(req, res, next)
+// });
+// app.get('*', (req, res) => {
+//   all(req, res)
+// });
+
+
+// POST /users
+app.post('/users', (req, res) => {
+  // console.log('test');
+
+  const body = _.pick(req.body, ['email', 'password']);
+  const user = new User(body);
+
+  user.save()
+    .then(user => {
+      // res.send(user);
+      return user.generateAuthToken();
+    })
+    .then(token => {
+      res
+        .header('x-auth', token)
+        .send(user)
+    })
+    .catch(err => {
+      res.status(400).send(err);
+    })
+});
+
+
+
+app.get('/users/me', authenticate, (req, res)=> {
+  res.send(req.user);
+});
+
+
+// app.get('/users/me', (req, res) => {
+//   const token = req.header('x-auth');
+//   // console.log(token);
+
+//   User.findByToken(token).then(user => {
+//     if (!user) {
+//       res.status(401).send();
+//       // return Promise.reject();
+//     }
+
+//     res.send(user);
+//   }).catch(e => {
+//     res.status(401).send(e); 
+//   });
+//   // User.findByToken()
+//   // console.log('a');
+// });
 
 
 app.listen(port, () => {
